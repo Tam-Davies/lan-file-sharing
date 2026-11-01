@@ -1,0 +1,337 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAN File Share</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">↗</div>
+            <div>
+                <h1>LAN Share</h1>
+                <span>File Sharing</span>
+            </div>
+        </div>
+
+        <nav>
+            <a href="#dashboard" class="nav-item active">
+                <span>▦</span>
+                Dashboard
+            </a>
+
+            <a href="#files" class="nav-item">
+                <span>□</span>
+                Shared Files
+            </a>
+
+            <a href="#history" class="nav-item">
+                <span>◷</span>
+                Sharing History
+            </a>
+        </nav>
+
+        <div class="network-card">
+            <span class="status-dot"></span>
+
+            <div>
+                <strong>Network Active</strong>
+                <small>Local network sharing</small>
+            </div>
+        </div>
+
+    </aside>
+
+
+    <!-- Main content -->
+    <main class="main">
+
+        <!-- Header -->
+        <header class="topbar">
+
+            <div>
+                <p class="eyebrow">LOCAL NETWORK</p>
+                <h2>File Sharing Dashboard</h2>
+            </div>
+
+            <div class="connection">
+                <span class="status-dot"></span>
+                Connected
+            </div>
+
+        </header>
+
+
+        <!-- Dashboard -->
+        <section id="dashboard">
+
+            <!-- Upload -->
+            <div class="upload-card">
+
+                <div class="upload-icon">
+                    ↑
+                </div>
+
+                <div class="upload-content">
+
+                    <h3>Share files with your network</h3>
+
+                    <p>
+                        Upload files and make them instantly available
+                        to other devices connected to this network.
+                    </p>
+
+                    <form action="/upload"
+                          method="POST"
+                          enctype="multipart/form-data">
+
+                        <label class="upload-button">
+
+                            Select File
+
+                            <input type="file"
+                                   name="file"
+                                   required
+                                   onchange="this.form.submit()">
+
+                        </label>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+            <!-- Stats -->
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <span class="stat-label">Shared Files</span>
+                    <strong>{{ files|length }}</strong>
+                </div>
+
+                <div class="stat-card">
+                    <span class="stat-label">Recent Activity</span>
+                    <strong>{{ history|length }}</strong>
+                </div>
+
+                <div class="stat-card">
+                    <span class="stat-label">Network</span>
+                    <strong>LAN</strong>
+                </div>
+
+            </div>
+
+
+            <!-- Files -->
+            <section id="files" class="content-card">
+
+                <div class="section-header">
+
+                    <div>
+                        <p class="eyebrow">STORAGE</p>
+                        <h3>Shared Files</h3>
+                    </div>
+
+                    <span class="count">
+                        {{ files|length }} files
+                    </span>
+
+                </div>
+
+                {% if files %}
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>File</th>
+                                <th>Size</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                        {% for file in files %}
+
+                            <tr>
+
+                                <td>
+                                    <div class="file-name">
+                                        <span class="file-icon">□</span>
+                                        {{ file.name }}
+                                    </div>
+                                </td>
+
+                                <td>
+                                    {{ "%.2f"|format(file.size / 1024 / 1024) }}
+                                    MB
+                                </td>
+
+                                <td>
+                                    <a class="download-button"
+                                       href="{{ url_for('download_file', filename=file.name) }}">
+                                        Download
+                                    </a>
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                {% else %}
+
+                <div class="empty-state">
+                    <div class="empty-icon">□</div>
+                    <h4>No files shared yet</h4>
+                    <p>
+                        Upload a file above to make it available
+                        on the network.
+                    </p>
+                </div>
+
+                {% endif %}
+
+            </section>
+
+
+            <!-- History -->
+            <section id="history" class="content-card">
+
+                <div class="section-header">
+
+                    <div>
+                        <p class="eyebrow">ACTIVITY</p>
+                        <h3>Sharing History</h3>
+                    </div>
+
+                    <span class="count">
+                        Last 50 activities
+                    </span>
+
+                </div>
+
+
+                {% if history %}
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>File</th>
+                                <th>Action</th>
+                                <th>Client</th>
+                                <th>Time</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                        {% for item in history %}
+
+                            <tr>
+
+                                <td>
+                                    <div class="file-name">
+                                        <span class="file-icon">□</span>
+                                        {{ item.filename }}
+                                    </div>
+                                </td>
+
+                                <td>
+
+                                    {% if item.action == "UPLOAD" %}
+
+                                        <span class="badge upload">
+                                            UPLOAD
+                                        </span>
+
+                                    {% elif item.action == "DOWNLOAD" %}
+
+                                        <span class="badge download">
+                                            DOWNLOAD
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge">
+                                            {{ item.action }}
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+                                    {{ item.client_ip }}
+                                </td>
+
+                                <td>
+                                    {{ item.timestamp }}
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                {% else %}
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">◷</div>
+
+                    <h4>No activity yet</h4>
+
+                    <p>
+                        File uploads and downloads will appear here.
+                    </p>
+
+                </div>
+
+                {% endif %}
+
+            </section>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+</body>
+</html>
+```
