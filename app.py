@@ -120,8 +120,7 @@ def index():
         "index.html",
         files=files,
         history=history,
-        server=is_server(),
-        client_ip=client_ip,
+        is_server=is_server(),
     )
 
 
