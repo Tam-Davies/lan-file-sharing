@@ -1,32 +1,71 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+    /* ================================
+       THEME TOGGLE
+    ================================= */
+
     const themeToggle = document.getElementById("themeToggle");
 
     const savedTheme = localStorage.getItem("tammydx-theme");
 
     if (savedTheme === "dark") {
         document.body.classList.add("dark");
-        themeToggle.textContent = "☀";
+
+        if (themeToggle) {
+            themeToggle.textContent = "☀";
+        }
     }
 
-    themeToggle.addEventListener("click", () => {
+    if (themeToggle) {
+        themeToggle.addEventListener("click", () => {
 
-        document.body.classList.toggle("dark");
+            document.body.classList.toggle("dark");
 
-        const darkMode =
-            document.body.classList.contains("dark");
+            const darkMode =
+                document.body.classList.contains("dark");
 
-        localStorage.setItem(
-            "tammydx-theme",
-            darkMode ? "dark" : "light"
-        );
+            localStorage.setItem(
+                "tammydx-theme",
+                darkMode ? "dark" : "light"
+            );
 
-        themeToggle.textContent =
-            darkMode ? "☀" : "☾";
-    });
+            themeToggle.textContent =
+                darkMode ? "☀" : "☾";
+        });
+    }
 
 
-    /* Highlight navigation item */
+    /* ================================
+       FILE SELECTION
+    ================================= */
+
+    const fileInput = document.getElementById("file");
+    const fileLabel = document.querySelector(".file-input span");
+
+    if (fileInput && fileLabel) {
+
+        fileInput.addEventListener("change", () => {
+
+            if (fileInput.files.length > 0) {
+
+                const selectedFile = fileInput.files[0];
+
+                fileLabel.textContent =
+                    selectedFile.name;
+
+            } else {
+
+                fileLabel.textContent =
+                    "Choose File";
+            }
+
+        });
+    }
+
+
+    /* ================================
+       HIGHLIGHT NAVIGATION ITEM
+    ================================= */
 
     const sections =
         document.querySelectorAll(".section");
@@ -34,39 +73,42 @@ document.addEventListener("DOMContentLoaded", () => {
     const navLinks =
         document.querySelectorAll(".nav-link");
 
-    const observer =
-        new IntersectionObserver(
-            entries => {
+    if (sections.length && navLinks.length) {
 
-                entries.forEach(entry => {
+        const observer =
+            new IntersectionObserver(
+                entries => {
 
-                    if (!entry.isIntersecting) {
-                        return;
-                    }
+                    entries.forEach(entry => {
 
-                    navLinks.forEach(link => {
-                        link.classList.remove("active");
+                        if (!entry.isIntersecting) {
+                            return;
+                        }
+
+                        navLinks.forEach(link => {
+                            link.classList.remove("active");
+                        });
+
+                        const active =
+                            document.querySelector(
+                                `.nav-link[href="#${entry.target.id}"]`
+                            );
+
+                        if (active) {
+                            active.classList.add("active");
+                        }
+
                     });
 
-                    const active =
-                        document.querySelector(
-                            `.nav-link[href="#${entry.target.id}"]`
-                        );
+                },
+                {
+                    threshold: 0.25
+                }
+            );
 
-                    if (active) {
-                        active.classList.add("active");
-                    }
-
-                });
-
-            },
-            {
-                threshold: 0.25
-            }
-        );
-
-    sections.forEach(section => {
-        observer.observe(section);
-    });
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+    }
 
 });
