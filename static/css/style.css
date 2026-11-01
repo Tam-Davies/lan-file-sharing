@@ -558,3 +558,185 @@ tbody tr:last-child td {
         width: 100%;
     }
 }
+
+/* ================= MOBILE CLIENT ================= */
+
+.mobile-client {
+    min-height: 100vh;
+    background: #f6f7f9;
+}
+
+.mobile-header {
+    background: #111827;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mobile-brand {
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.mobile-header span {
+    color: #9ca3af;
+    font-size: 13px;
+}
+
+.online {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #86efac !important;
+    font-size: 13px !important;
+}
+
+.online span {
+    width: 8px;
+    height: 8px;
+    background: #22c55e;
+    border-radius: 50%;
+}
+
+.client-content {
+    padding: 20px;
+    max-width: 700px;
+    margin: auto;
+}
+
+.welcome h1 {
+    margin-bottom: 5px;
+}
+
+.welcome p {
+    color: #6b7280;
+    margin-bottom: 25px;
+}
+
+.mobile-files {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mobile-file {
+    background: white;
+    border-radius: 14px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.mobile-file-icon {
+    font-size: 28px;
+}
+
+.mobile-file-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.mobile-file-info strong {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mobile-file-info span {
+    display: block;
+    color: #6b7280;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.mobile-download {
+    background: #111827;
+    color: white;
+    text-decoration: none;
+    padding: 10px 14px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.client-history {
+    margin-top: 35px;
+}
+
+.client-section-title {
+    margin-bottom: 12px;
+}
+
+.client-section-title h2 {
+    margin-bottom: 4px;
+}
+
+.client-section-title p {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.activity-card {
+    background: white;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+}
+
+.activity-card strong {
+    display: block;
+    font-size: 14px;
+}
+
+.activity-card span {
+    color: #6b7280;
+    font-size: 11px;
+}
+
+.download-label {
+    color: #16a34a !important;
+    font-weight: 700;
+    font-size: 10px !important;
+}
+
+.mobile-empty {
+    background: white;
+    padding: 30px;
+    text-align: center;
+    border-radius: 14px;
+    color: #6b7280;
+}
+
+
+/* Hide desktop navigation on small screens */
+
+@media (max-width: 700px) {
+
+    .sidebar {
+        display: none;
+    }
+
+    .main {
+        margin-left: 0 !important;
+        width: 100%;
+    }
+
+    .mobile-file {
+        align-items: center;
+    }
+
+    .mobile-download {
+        padding: 9px 11px;
+        font-size: 12px;
+    }
+}
