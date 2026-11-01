@@ -1,14 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    /* ================================
+    /* =========================================
        THEME TOGGLE
-    ================================= */
+    ========================================= */
 
-    const themeToggle = document.getElementById("themeToggle");
+    const themeToggle =
+        document.getElementById("themeToggle");
 
-    const savedTheme = localStorage.getItem("tammydx-theme");
+    const savedTheme =
+        localStorage.getItem("tammydx-theme");
 
     if (savedTheme === "dark") {
+
         document.body.classList.add("dark");
 
         if (themeToggle) {
@@ -17,6 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (themeToggle) {
+
         themeToggle.addEventListener("click", () => {
 
             document.body.classList.toggle("dark");
@@ -31,16 +35,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
             themeToggle.textContent =
                 darkMode ? "☀" : "☾";
+
         });
+
     }
 
 
-    /* ================================
+    /* =========================================
        FILE SELECTION
-    ================================= */
+    ========================================= */
 
-    const fileInput = document.getElementById("file");
-    const fileLabel = document.querySelector(".file-input span");
+    const fileInput =
+        document.getElementById("file");
+
+    const fileLabel =
+        document.querySelector(".file-input span");
 
     if (fileInput && fileLabel) {
 
@@ -48,7 +57,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (fileInput.files.length > 0) {
 
-                const selectedFile = fileInput.files[0];
+                const selectedFile =
+                    fileInput.files[0];
 
                 fileLabel.textContent =
                     selectedFile.name;
@@ -57,15 +67,72 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 fileLabel.textContent =
                     "Choose File";
+
             }
 
         });
+
     }
 
 
-    /* ================================
+    /* =========================================
+       MOBILE MENU
+    ========================================= */
+
+    const menuToggle =
+        document.getElementById("menuToggle");
+
+    const topNav =
+        document.getElementById("topNav");
+
+    if (menuToggle && topNav) {
+
+        menuToggle.addEventListener("click", () => {
+
+            topNav.classList.toggle("mobile-open");
+
+            const isOpen =
+                topNav.classList.contains("mobile-open");
+
+            menuToggle.textContent =
+                isOpen ? "✕" : "☰";
+
+            menuToggle.setAttribute(
+                "aria-expanded",
+                isOpen ? "true" : "false"
+            );
+
+        });
+
+
+        /* Close menu when a navigation link is clicked */
+
+        const mobileLinks =
+            topNav.querySelectorAll(".nav-link");
+
+        mobileLinks.forEach(link => {
+
+            link.addEventListener("click", () => {
+
+                topNav.classList.remove("mobile-open");
+
+                menuToggle.textContent = "☰";
+
+                menuToggle.setAttribute(
+                    "aria-expanded",
+                    "false"
+                );
+
+            });
+
+        });
+
+    }
+
+
+    /* =========================================
        HIGHLIGHT NAVIGATION ITEM
-    ================================= */
+    ========================================= */
 
     const sections =
         document.querySelectorAll(".section");
@@ -109,6 +176,33 @@ document.addEventListener("DOMContentLoaded", () => {
         sections.forEach(section => {
             observer.observe(section);
         });
+
     }
+
+
+    /* =========================================
+       CLOSE MOBILE MENU WHEN RESIZING
+    ========================================= */
+
+    window.addEventListener("resize", () => {
+
+        if (
+            window.innerWidth > 800 &&
+            topNav &&
+            menuToggle
+        ) {
+
+            topNav.classList.remove("mobile-open");
+
+            menuToggle.textContent = "☰";
+
+            menuToggle.setAttribute(
+                "aria-expanded",
+                "false"
+            );
+
+        }
+
+    });
 
 });
