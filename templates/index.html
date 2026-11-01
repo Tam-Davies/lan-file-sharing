@@ -1,27 +1,31 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>LAN File Share</title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body>
 
+{% if server %}
+
+<!-- ================= SERVER VIEW ================= -->
+
 <div class="app">
 
-    <!-- Sidebar -->
     <aside class="sidebar">
 
         <div class="brand">
-            <div class="brand-icon">↗</div>
+            <div class="brand-icon">T</div>
+
             <div>
-                <h1>LAN Share</h1>
-                <span>File Sharing</span>
+                <h2>TammyDX</h2>
+                <span>LAN File Share</span>
             </div>
         </div>
 
@@ -42,286 +46,159 @@
             </a>
         </nav>
 
-        <div class="network-card">
+        <div class="server-status">
             <span class="status-dot"></span>
-
-            <div>
-                <strong>Network Active</strong>
-                <small>Local network sharing</small>
-            </div>
+            Server Online
         </div>
 
     </aside>
 
 
-    <!-- Main content -->
     <main class="main">
 
-        <!-- Header -->
         <header class="topbar">
-
             <div>
-                <p class="eyebrow">LOCAL NETWORK</p>
-                <h2>File Sharing Dashboard</h2>
+                <h1>Dashboard</h1>
+                <p>Manage files shared across your LAN.</p>
             </div>
 
-            <div class="connection">
-                <span class="status-dot"></span>
-                Connected
+            <div class="server-badge">
+                SERVER
             </div>
-
         </header>
 
 
-        <!-- Dashboard -->
-        <section id="dashboard">
+        <section class="upload-card">
 
-            <!-- Upload -->
-            <div class="upload-card">
+            <div>
+                <h2>Share a file</h2>
+                <p>Upload a file for devices on your network.</p>
+            </div>
 
-                <div class="upload-icon">
-                    ↑
+            <form action="/upload" method="POST" enctype="multipart/form-data">
+
+                <label class="file-input">
+                    <input type="file" name="file" required>
+                    <span>Select File</span>
+                </label>
+
+                <button type="submit">
+                    Upload File
+                </button>
+
+            </form>
+
+        </section>
+
+
+        <section id="files" class="section">
+
+            <div class="section-header">
+                <div>
+                    <h2>Shared Files</h2>
+                    <p>Files currently available on the network.</p>
                 </div>
 
-                <div class="upload-content">
-
-                    <h3>Share files with your network</h3>
-
-                    <p>
-                        Upload files and make them instantly available
-                        to other devices connected to this network.
-                    </p>
-
-                    <form action="/upload"
-                          method="POST"
-                          enctype="multipart/form-data">
-
-                        <label class="upload-button">
-
-                            Select File
-
-                            <input type="file"
-                                   name="file"
-                                   required
-                                   onchange="this.form.submit()">
-
-                        </label>
-
-                    </form>
-
-                </div>
-
+                <span class="count">
+                    {{ files|length }} files
+                </span>
             </div>
 
 
-            <!-- Stats -->
-            <div class="stats-grid">
+            {% if files %}
 
-                <div class="stat-card">
-                    <span class="stat-label">Shared Files</span>
-                    <strong>{{ files|length }}</strong>
+            <div class="file-grid">
+
+                {% for file in files %}
+
+                <div class="file-card">
+
+                    <div class="file-icon">
+                        📄
+                    </div>
+
+                    <div class="file-info">
+
+                        <strong>{{ file.name }}</strong>
+
+                        <span>
+                            {{ "%.1f"|format(file.size / 1024) }} KB
+                        </span>
+
+                    </div>
+
+                    <a
+                        href="{{ url_for('download_file', filename=file.name) }}"
+                        class="download-button"
+                    >
+                        Download
+                    </a>
+
                 </div>
 
-                <div class="stat-card">
-                    <span class="stat-label">Recent Activity</span>
-                    <strong>{{ history|length }}</strong>
-                </div>
-
-                <div class="stat-card">
-                    <span class="stat-label">Network</span>
-                    <strong>LAN</strong>
-                </div>
+                {% endfor %}
 
             </div>
 
+            {% else %}
 
-            <!-- Files -->
-            <section id="files" class="content-card">
+            <div class="empty-state">
+                No files have been shared yet.
+            </div>
 
-                <div class="section-header">
+            {% endif %}
 
-                    <div>
-                        <p class="eyebrow">STORAGE</p>
-                        <h3>Shared Files</h3>
-                    </div>
+        </section>
 
-                    <span class="count">
-                        {{ files|length }} files
+
+        <section id="history" class="section">
+
+            <div class="section-header">
+                <div>
+                    <h2>Sharing History</h2>
+                    <p>All file activity across the network.</p>
+                </div>
+            </div>
+
+
+            {% if history %}
+
+            <div class="history-table">
+
+                <div class="history-header">
+                    <span>File</span>
+                    <span>Action</span>
+                    <span>Client</span>
+                    <span>Time</span>
+                </div>
+
+                {% for item in history %}
+
+                <div class="history-row">
+
+                    <span>{{ item.filename }}</span>
+
+                    <span class="action {{ item.action|lower }}">
+                        {{ item.action }}
                     </span>
 
-                </div>
+                    <span>{{ item.client_ip }}</span>
 
-                {% if files %}
-
-                <div class="table-wrapper">
-
-                    <table>
-
-                        <thead>
-                            <tr>
-                                <th>File</th>
-                                <th>Size</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-
-                        {% for file in files %}
-
-                            <tr>
-
-                                <td>
-                                    <div class="file-name">
-                                        <span class="file-icon">□</span>
-                                        {{ file.name }}
-                                    </div>
-                                </td>
-
-                                <td>
-                                    {{ "%.2f"|format(file.size / 1024 / 1024) }}
-                                    MB
-                                </td>
-
-                                <td>
-                                    <a class="download-button"
-                                       href="{{ url_for('download_file', filename=file.name) }}">
-                                        Download
-                                    </a>
-                                </td>
-
-                            </tr>
-
-                        {% endfor %}
-
-                        </tbody>
-
-                    </table>
+                    <span>{{ item.timestamp }}</span>
 
                 </div>
 
-                {% else %}
+                {% endfor %}
 
-                <div class="empty-state">
-                    <div class="empty-icon">□</div>
-                    <h4>No files shared yet</h4>
-                    <p>
-                        Upload a file above to make it available
-                        on the network.
-                    </p>
-                </div>
+            </div>
 
-                {% endif %}
+            {% else %}
 
-            </section>
+            <div class="empty-state">
+                No activity yet.
+            </div>
 
-
-            <!-- History -->
-            <section id="history" class="content-card">
-
-                <div class="section-header">
-
-                    <div>
-                        <p class="eyebrow">ACTIVITY</p>
-                        <h3>Sharing History</h3>
-                    </div>
-
-                    <span class="count">
-                        Last 50 activities
-                    </span>
-
-                </div>
-
-
-                {% if history %}
-
-                <div class="table-wrapper">
-
-                    <table>
-
-                        <thead>
-
-                            <tr>
-                                <th>File</th>
-                                <th>Action</th>
-                                <th>Client</th>
-                                <th>Time</th>
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                        {% for item in history %}
-
-                            <tr>
-
-                                <td>
-                                    <div class="file-name">
-                                        <span class="file-icon">□</span>
-                                        {{ item.filename }}
-                                    </div>
-                                </td>
-
-                                <td>
-
-                                    {% if item.action == "UPLOAD" %}
-
-                                        <span class="badge upload">
-                                            UPLOAD
-                                        </span>
-
-                                    {% elif item.action == "DOWNLOAD" %}
-
-                                        <span class="badge download">
-                                            DOWNLOAD
-                                        </span>
-
-                                    {% else %}
-
-                                        <span class="badge">
-                                            {{ item.action }}
-                                        </span>
-
-                                    {% endif %}
-
-                                </td>
-
-                                <td>
-                                    {{ item.client_ip }}
-                                </td>
-
-                                <td>
-                                    {{ item.timestamp }}
-                                </td>
-
-                            </tr>
-
-                        {% endfor %}
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-                {% else %}
-
-                <div class="empty-state">
-
-                    <div class="empty-icon">◷</div>
-
-                    <h4>No activity yet</h4>
-
-                    <p>
-                        File uploads and downloads will appear here.
-                    </p>
-
-                </div>
-
-                {% endif %}
-
-            </section>
+            {% endif %}
 
         </section>
 
@@ -330,8 +207,330 @@
 </div>
 
 
+{% else %}
+
+<!-- ================= CLIENT / PHONE VIEW ================= -->
+
+<div class="mobile-client">
+
+    <header class="mobile-header">
+
+        <div>
+            <div class="mobile-brand">
+                TammyDX
+            </div>
+
+            <span>
+                LAN File Share
+            </span>
+        </div>
+
+        <div class="online">
+            <span></span>
+            Online
+        </div>
+
+    </header>
+
+
+    <main class="client-content">
+
+        <section class="welcome">
+
+            <h1>Shared Files</h1>
+
+            <p>
+                Download files shared by the server.
+            </p>
+
+        </section>
+
+
+        {% if files %}
+
+        <section class="mobile-files">
+
+            {% for file in files %}
+
+            <div class="mobile-file">
+
+                <div class="mobile-file-icon">
+                    📄
+                </div>
+
+                <div class="mobile-file-info">
+
+                    <strong>
+                        {{ file.name }}
+                    </strong>
+
+                    <span>
+                        {{ "%.1f"|format(file.size / 1024) }} KB
+                    </span>
+
+                </div>
+
+                <a
+                    href="{{ url_for('download_file', filename=file.name) }}"
+                    class="mobile-download"
+                >
+                    Download
+                </a>
+
+            </div>
+
+            {% endfor %}
+
+        </section>
+
+        {% else %}
+
+        <div class="mobile-empty">
+            No files are currently available.
+        </div>
+
+        {% endif %}
+
+
+        <section class="client-history">
+
+            <div class="client-section-title">
+
+                <div>
+                    <h2>My Activity</h2>
+
+                    <p>
+                        Your downloads on this device.
+                    </p>
+                </div>
+
+            </div>
+
+
+            {% if history %}
+
+            {% for item in history %}
+
+            <div class="activity-card">
+
+                <div>
+                    <strong>
+                        {{ item.filename }}
+                    </strong>
+
+                    <span>
+                        {{ item.timestamp }}
+                    </span>
+                </div>
+
+                <span class="download-label">
+                    DOWNLOADED
+                </span>
+
+            </div>
+
+            {% endfor %}
+
+            {% else %}
+
+            <div class="mobile-empty">
+                No downloads yet.
+            </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+</div>
+
+{% endif %}
+
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 
 </body>
 </html>
-```
+
+
+/* ================= MOBILE CLIENT ================= */
+
+.mobile-client {
+    min-height: 100vh;
+    background: #f6f7f9;
+}
+
+.mobile-header {
+    background: #111827;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mobile-brand {
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.mobile-header span {
+    color: #9ca3af;
+    font-size: 13px;
+}
+
+.online {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #86efac !important;
+    font-size: 13px !important;
+}
+
+.online span {
+    width: 8px;
+    height: 8px;
+    background: #22c55e;
+    border-radius: 50%;
+}
+
+.client-content {
+    padding: 20px;
+    max-width: 700px;
+    margin: auto;
+}
+
+.welcome h1 {
+    margin-bottom: 5px;
+}
+
+.welcome p {
+    color: #6b7280;
+    margin-bottom: 25px;
+}
+
+.mobile-files {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mobile-file {
+    background: white;
+    border-radius: 14px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.mobile-file-icon {
+    font-size: 28px;
+}
+
+.mobile-file-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.mobile-file-info strong {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mobile-file-info span {
+    display: block;
+    color: #6b7280;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.mobile-download {
+    background: #111827;
+    color: white;
+    text-decoration: none;
+    padding: 10px 14px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.client-history {
+    margin-top: 35px;
+}
+
+.client-section-title {
+    margin-bottom: 12px;
+}
+
+.client-section-title h2 {
+    margin-bottom: 4px;
+}
+
+.client-section-title p {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.activity-card {
+    background: white;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+}
+
+.activity-card strong {
+    display: block;
+    font-size: 14px;
+}
+
+.activity-card span {
+    color: #6b7280;
+    font-size: 11px;
+}
+
+.download-label {
+    color: #16a34a !important;
+    font-weight: 700;
+    font-size: 10px !important;
+}
+
+.mobile-empty {
+    background: white;
+    padding: 30px;
+    text-align: center;
+    border-radius: 14px;
+    color: #6b7280;
+}
+
+
+/* Hide desktop navigation on small screens */
+
+@media (max-width: 700px) {
+
+    .sidebar {
+        display: none;
+    }
+
+    .main {
+        margin-left: 0 !important;
+        width: 100%;
+    }
+
+    .mobile-file {
+        align-items: center;
+    }
+
+    .mobile-download {
+        padding: 9px 11px;
+        font-size: 12px;
+    }
+}
